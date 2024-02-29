@@ -11,12 +11,13 @@ fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(12, 6))
 # x to dziedzina: 50 próbek z zakresu [-3, 3] wygenerowanych liniowo
 # y to exp(-x^2)
 # y_err to szum pochodzący z rozkładu normalnego o zadanych parametrach
-x = ... # deklaracja x
-y = ... # wyliczenie y
+x = np.random.uniform(low=-3.0, high=3.0, size=50)
+x.sort()        # punkty w sensownej kolejności, aby wykres był funkcją
+y = np.exp(-x**2)
 y_err = np.random.normal(loc=np.mean(y), scale=0.1, size=len(y))
 
 # Zaznaczamy x, y oraz obszar szumu wokół funkcji
-... # wykreślenie y
+ax[0].plot(x,y, label="exp(-x^2)") # wykreślenie y
 ax[0].fill_between(x, y - y_err, y + y_err, alpha=0.2, label="+/- szum")
 
 # Dodajemy oznaczenia osi i legendę na górze po lewej stronie
@@ -33,17 +34,17 @@ y_2 = np.sin(x)
 
 # Kreślimy obie funkcje
 ax[1].plot(x, y_1, label="cos(x/3)")
-... # wykreślenie y_2
+ax[1].plot(x, y_2, label="sin(x)") # wykreślenie y_2
 
 # Ustawiamy skalę osi x na symetryczną-logarytmiczną oraz dodajemy siatkę w
 # tle kreślonych krzywych
-... # skala
-... # grid
+ax[1].set_xscale('symlog') # skala https://matplotlib.org/stable/users/explain/axes/axes_scales.html
+ax[1].grid() # grid
 
 # Dodajemy oznaczenia osi i legendę na dole po prawej stronie
 ax[1].set_xlabel("x")
 ax[1].set_ylabel("y")
-... # Legenda
+ax[1].legend() # Legenda
 
 # Dodajemy tytuł
 plt.suptitle("Funkcje wygenerowane w 'numpy' i wykreślone w 'matplotlib'")
