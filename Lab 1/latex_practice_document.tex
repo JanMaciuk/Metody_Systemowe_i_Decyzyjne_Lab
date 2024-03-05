@@ -1,23 +1,25 @@
 \documentclass{article}
+\usepackage{hyperref}
+\usepackage{graphicx}
 
 \title{Przykladowy dokument}
 \author{Jan Maciuk}
 \date{\today}
 
 \begin{document}
-\pagenumbering{Arabic}
+\pagenumbering{arabic}
 \maketitle
-\section{Spis tresci}
-%Tu będzie spis treści
+\tableofcontents
 
+\newpage
 \section{Pierwsza sekcja}
-\textbf{1 Pierwsza sekcja}
+
 
 \subsection{Pierwsza podsekcja}
-\textbf{1.1 Pierwsza podsekcja}
+
 
 \subsubsection{Pierwsza podpodsekcja}
-\textbf{1.1.1 pierwsza podpodsekcja}
+
 
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut purus elit, vestibulum ut, placerat ac, adipiscing vitae, felis. Curabitur dictum gravida mauris.
 Nam arcu libero, nonummy eget, consectetuer id, vulputate a, magna. Donec vehicula augue eu neque. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. 
@@ -27,10 +29,110 @@ Integer sapien est, iaculis in, pretium quis, viverra ac, nunc. Praesent eget se
 Morbi dolor nulla, malesuada eu, pulvinar at, mollis ac, nulla. Curabitur auctor semper nulla. Donec varius orci eget risus. 
 Duis nibh mi, congue eu, accumsan eleifend, sagittis quis, diam. Duis eget orci sit amet orci dignissim rutrum.
 
+Nam dui ligula, fringilla a, euismod sodales, sollicitudin vel, wisi. Morbi
+auctor lorem non justo. Nam lacus libero, pretium at, lobortis vitae, ultricies et,
+tellus. Donec aliquet, tortor sed accumsan bibendum, erat ligula aliquet magna,
+vitae ornare odio metus a mi. Morbi ac orci et nisl hendrerit mollis. Suspendisse
+ut massa. Cras nec ante. Pellentesque a nulla. Cum sociis natoque penatibus et
+magnis dis parturient montes, nascetur ridiculus mus. Aliquam tincidunt urna.
+Nulla ullamcorper vestibulum turpis. Pellentesque cursus luctus mauris.
+
+Nulla malesuada porttitor diam. Donec felis erat, congue non, volutpat at,
+tincidunt tristique, libero. Vivamus viverra fermentum felis. Donec nonummy
+pellentesque ante. Phasellus adipiscing semper elit. Proin fermentum massa
+ac quam. Sed diam turpis, molestie vitae, placerat a, molestie nec, leo. Maecenas lacinia. Nam ipsum ligula, eleifend at, accumsan nec, suscipit a, ipsum.
+Morbi blandit ligula feugiat magna. Nunc eleifend consequat lorem. Sed lacinia
+nulla vitae enim. Pellentesque tincidunt purus vel magna. Integer non enim.
+Praesent euismod nunc eu purus. Donec bibendum quam in tellus. Nullam cursus pulvinar lectus. Donec et mi. Nam vulputate metus eu enim. Vestibulum
+pellentesque felis eu massa.
+
+Quisque ullamcorper placerat ipsum. Cras nibh. Morbi vel justo vitae lacus
+tincidunt ultrices. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. In
+hac habitasse platea dictumst. Integer tempus convallis augue. Etiam facilisis.
+Nunc elementum fermentum wisi. Aenean placerat. Ut imperdiet, enim sed
+gravida sollicitudin, felis odio placerat quam, ac pulvinar elit purus eget enim.
+Nunc vitae tortor. Proin tempus nibh sit amet nisl. Vivamus quis tortor vitae
+risus porta vehicula.
+
+Fusce mauris. Vestibulum luctus nibh at lectus. Sed bibendum, nulla a faucibus semper, leo velit ultricies tellus, ac venenatis arcu wisi vel nisl. Vestibulum
+diam. Aliquam pellentesque, augue quis sagittis posuere, turpis lacus congue
+quam, in hendrerit risus eros eget felis. Maecenas eget erat in sapien mattis
+porttitor. Vestibulum porttitor. Nulla facilisi. Sed a turpis eu lacus commodo
+facilisis. Morbi fringilla, wisi in dignissim interdum, justo lectus sagittis dui, et
+vehicula libero dui cursus dui. Mauris tempor ligula sed lacus. Duis cursus enim
+ut augue. Cras ac magna. Cras nulla. Nulla egestas. Curabitur a leo. Quisque
+egestas wisi eget nunc. Nam feugiat lacus vel est. Curabitur consectetuer.
+
+Suspendisse vel felis. Ut lorem lorem, interdum eu, tincidunt sit amet, laoreet vitae, arcu. Aenean faucibus pede eu ante. Praesent enim elit, rutrum at,
+molestie non, nonummy vel, nisl. Ut lectus eros, malesuada sit amet, fermentum
+eu, sodales cursus, magna. Donec eu purus. Quisque vehicula, urna sed ultricies
+auctor, pede lorem egestas dui, et convallis elit erat sed nulla. Donec luctus.
+Curabitur et nunc. Aliquam dolor odio, commodo pretium, ultricies non, pharetra in, velit. Integer arcu est, nonummy in, fermentum faucibus, egestas vel,
+odio.
+
+\section{Style tektsów}
+Ten tekst jest w \textit{kursywie}, ten \underline{podkreślony}, ten \textbf{wytłuszczony}, \newline
+a tamten \textbf{\textit{\underline{ma wszystko na raz!}}} 
+
+\section{Środowiska}
+
+\subsection{Listy}
+Lista punktowa:
+\begin{itemize}
+    \item to
+    \item jest
+    \item lista
+\end{itemize}
+Lista wyliczeniowa:
+\begin{enumerate}
+    \item to
+    \item jest
+    \item lista
+\end{enumerate}
 \newpage
 
-\section{Druga sekcja}
-\textbf{2 Druga sekcja}
+\subsection{Równania}
+Jest kilka sposóbów pisania równań, "inline", np: \(x^2 + y^2 = z^2\), lub takie duże równania:
+\begin{equation}
+    \int \frac{x^2 + 2x + 1}{x + 1} \, dx
+\end{equation}
+
+\subsection{Tabelki}
+Annoying, ale jak trzeba to trzeba.
+\begin{table}[htb]
+    \centering
+    \begin{tabular}{|l|c|r|}
+    \hline
+    Imie   & Nazwisko & IQ  \\ \hline
+    Jan    & Kowalski & 100 \\ \hline
+    Michał & Duży     & 37  \\ \hline
+    Jan    & Duży     & 150 \\ \hline
+    \end{tabular}
+    \caption{Przykładowa tabela}
+    \end{table}
+
+\href{https://www.google.com}{Link} do popularnej strony: 
+
+\subsection{Obrazki}
+Natywnie \LaTeX\ nie wspiera obrazków (dziwne jak na niby takie rozbudowane cudo), ale jest do tego biblioteka:
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[scale=0.45]{pretty_picture}
+    \caption{Przykładowy obrazek}
+\end{figure}
+\newpage
+
+
+\begin{thebibliography}{9}
+    \bibitem{overleafr}
+    Overleaf.
+    \textit{Learn LaTeX in our free online course}.
+    \verb|https://www.overleaf.com/learn|.
+    Accessed: March 5, 2024.
+\end{thebibliography}
+
+
 
 
 \end{document}
