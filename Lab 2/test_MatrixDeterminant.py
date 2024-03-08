@@ -5,6 +5,7 @@ from typing import List
 import pytest
 
 
+
 def is_matrix_square(mat: List[List[int]]) -> bool:
     """
     Check if given matrix is a square one.
@@ -32,7 +33,7 @@ def get_minor_matrix(mat: List[List[int]], i: int, j: int) -> List[List[int]]:
 
     :return: minor matrix
     """
-    newMatrix = List[List[int]]
+    newMatrix: List[List[int]] = []
     for rowIndex in range(len(mat)):
         if rowIndex != i:
             newRow = []
@@ -43,7 +44,7 @@ def get_minor_matrix(mat: List[List[int]], i: int, j: int) -> List[List[int]]:
     return newMatrix
 
 
-def matrix_determinant(mat: List[List[int]]) -> int:
+def matrix_determinant(matrix: List[List[int]]) -> int:
     """
     Compute matrix determinant using Laplace method.
 
@@ -51,7 +52,27 @@ def matrix_determinant(mat: List[List[int]]) -> int:
 
     :return: determinant
     """
-    ...
+    if not is_matrix_square(matrix):
+        raise ValueError("Cannot calculate the determinant of a non-square matrix")
+    
+    def small_matrix_determinant(matrix: List[List[int]]) -> int:
+        if len(matrix) == 1:
+            return matrix[0][0]
+        if len(matrix) == 2:
+            return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+        else:
+            raise ValueError("Given matrix is too big")
+        
+    if len(matrix) < 3:
+        return small_matrix_determinant(matrix)
+    else:
+        det = 0
+        for j in range(len(matrix)):
+            det += ((-1) ** j) * matrix[0][j] * matrix_determinant(get_minor_matrix(matrix, 0, j))
+        return det
+    
+
+print(get_minor_matrix([[3, 0, -1], [-1, -1, 0], [1, -1, 2]], 0, 0))
 
 
 @pytest.mark.parametrize(
@@ -169,4 +190,4 @@ def test_matrix_determinant_correct(matrix, expected_determinant):
 def test_matrix_determinant_incorrect(incorrect_matrix):
     with pytest.raises(ValueError) as excinfo:
         matrix_determinant(incorrect_matrix)
-    assert "Matrix is not square!" in str(excinfo.value)
+    assert "Cannot calculate the determinant of a non-square matrix" in str(excinfo.value)
