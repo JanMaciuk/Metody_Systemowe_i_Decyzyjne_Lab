@@ -16,7 +16,7 @@ import pandas as pd
 
 def fetch_data_file() -> str:
     """Download a file with target data to fit LSS algo in."""
-    file = "GDP_happiness.csv"
+    file = "Lab 3/GDP_happiness.csv"
     url_server = "https://byes.pl/wp-content/uploads/datasets/" + file
     if not os.path.isfile(file):
         urllib.request.urlretrieve(url_server, file)
@@ -37,6 +37,7 @@ def read_data_vectors() -> Tuple[np.ndarray, np.ndarray]:
     return X, Y
 
 
+
 def get_polynomial_form(polynomial_degree: int) -> np.ndarray:
     """
     Get array with form of polynomial.
@@ -46,14 +47,28 @@ def get_polynomial_form(polynomial_degree: int) -> np.ndarray:
         [[0], [1], [2], [3]] - 3rd order, and so on...
     :return: a array with degrees of polynomial
     """
-    ...
+    i = 0
+    arr = np.ndarray((polynomial_degree + 1, 1))    # One column array
+    while i <= polynomial_degree:
+        arr[i] = i
+        i += 1
+    return arr
 
 
-def print_polynomial(theta: np.ndarray, precission: int = 3) -> str:
+
+def print_polynomial(theta: np.ndarray, precission: int = 3) -> str:   
     """Return string representation of polynomial."""
-    ...
+    str = ""
+    i = 0
+    while i < len(theta):
+        str += f"{round(theta[i][0], precission)}*x^{i}"
+        i += 1
+        if i < len(theta):
+            str += " + "
+    return str
 
 
+# TODO
 def least_squares_solution(
         X: np.ndarray, Y: np.ndarray, polynomial_degree: int
 ) -> np.ndarray:
@@ -103,5 +118,7 @@ if __name__ == "__main__":
     # here is a playground for your tests!
     X, Y = read_data_vectors()
     T = least_squares_solution(X, Y, 2)
-    print(print_polynomial(T))
-    visualise_LSS_method(X, Y, T)
+    print(get_polynomial_form(2))
+    print(np.array([[0], [1], [2]]))
+    #print(print_polynomial(np.array([[1.86548519e+00],[0.33807518e-02],[-1.04156655e-05]])))
+    #visualise_LSS_method(X, Y, T)
