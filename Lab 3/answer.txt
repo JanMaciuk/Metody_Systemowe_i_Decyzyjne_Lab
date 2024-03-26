@@ -1,0 +1,6 @@
+Wraz ze wziększeniem stopnia wielomianu który aproksymuje funkcje zmniejsza się średni błąd.
+Największe zmniejszenie następuje przy 3 pierwszych stopniach, wielomian 3 stopnia jest już względnie dokładny.
+Natomiast wielomiany wysokiego na wykresach często mają bardzo ekscentryczne kształty.
+Tam, gdzie nie ma punktów danych ich linie często wychodzą całkowicie poza skale.
+Najlepiej jest znaleźć balans, wielomian 3 stopnia jest w tym przypadku wystarczająco dokładny.
+Oczywiście zależy to od zbioru danych i naszych oczekiwań.

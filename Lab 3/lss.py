@@ -70,7 +70,7 @@ def print_polynomial(theta: np.ndarray, precission: int = 3) -> str:
 
 # TODO
 def least_squares_solution(
-        X: np.ndarray, Y: np.ndarray, polynomial_degree: int
+        X: np.ndarray, Y: np.ndarray, polynomial_degree: int, return_approx_error: bool = False
 ) -> np.ndarray:
     """
     Compute theta matrix with coefficients of polynomial fitted by LSS.
@@ -81,7 +81,14 @@ def least_squares_solution(
 
     :return: theta matrix of polynomial, shape = (1, polynomial_degree + 1)
     """
-    ...
+    original_output = np.polyfit(X, Y, polynomial_degree, full=True)  # Find the polynomial regression coefficients
+    if not return_approx_error:                             # Simply return the coefficents if we ask for them not the error                             
+        original_polyfit = original_output[0]               # Extract the polynomial regression coefficients from full output
+        reshape_polyfit = original_polyfit.reshape(-1, 1)   # Reshape the coefficents to match test expected output
+        return np.flip(reshape_polyfit)                     # Flip to match the expected output order (test driven)  
+    else:
+        # Return the approximation error instead of the coefficients   
+        return original_output[1]                             
 
 
 def generalised_linear_model(X: np.ndarray, T: np.ndarray) -> np.ndarray:
@@ -117,8 +124,11 @@ def visualise_LSS_method(X: np.ndarray, Y: np.ndarray, T: np.ndarray):
 if __name__ == "__main__":
     # here is a playground for your tests!
     X, Y = read_data_vectors()
-    T = least_squares_solution(X, Y, 2)
-    print(get_polynomial_form(2))
-    print(np.array([[0], [1], [2]]))
-    #print(print_polynomial(np.array([[1.86548519e+00],[0.33807518e-02],[-1.04156655e-05]])))
-    #visualise_LSS_method(X, Y, T)
+    T = least_squares_solution(X, Y, 3)
+    #print(get_polynomial_form(2))
+    #print(np.array([[0], [1], [2]]))
+    print("\n"+str(least_squares_solution(X, Y, 3, return_approx_error=False))+ "\n")
+    for i in range (0,15):
+        print(str(least_squares_solution(X, Y, i, return_approx_error=True))[1:-1])
+
+    visualise_LSS_method(X, Y, T)
