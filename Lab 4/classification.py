@@ -13,7 +13,20 @@ def get_confusion_matrix(
 
     :return: confusion matrix
     """
-    ...
+    # Protect from obviously invalid input
+    if len(y_true) != len(y_pred):
+        raise ValueError("Invalid input shapes!")
+    if (num_classes < max(max(y_true), max(y_pred))) or (num_classes < 0):
+        raise ValueError("Invalid prediction classes!")
+
+    
+    # Zero matrix, size is equal to the number of classes (square matrix)
+    confusion_matrix = [[0] * num_classes for i in range(num_classes)]
+    
+    for actual, predicted in zip(y_true, y_pred):
+        confusion_matrix[actual][predicted] += 1
+    
+    return confusion_matrix
 
 
 def get_quality_factors(
