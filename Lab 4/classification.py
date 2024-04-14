@@ -29,7 +29,26 @@ def get_quality_factors(
 
     :return: a tuple of TN, FP, FN, TP
     """
-    ...
+    if len(y_true) != len(y_pred):
+        raise ValueError("Lengths of input lists don't match.")
+    
+    TN = 0  # True Negative
+    FP = 0  # False Positive
+    FN = 0  # False Negative
+    TP = 0  # True Positive
+    
+    for actual, predicted in zip(y_true, y_pred):
+        if actual == 0 and predicted == 0:
+            TN += 1
+        elif actual == 0 and predicted == 1:
+            FP += 1
+        elif actual == 1 and predicted == 0:
+            FN += 1
+        elif actual == 1 and predicted == 1:
+            TP += 1
+    
+    return TN, FP, FN, TP
+
 
 def accuracy_score(y_true: List[int], y_pred: List[int]) -> float:
     """
@@ -39,7 +58,8 @@ def accuracy_score(y_true: List[int], y_pred: List[int]) -> float:
 
     :return: accuracy score
     """
-    ...
+    TN, FP, FN, TP = get_quality_factors(y_true, y_pred)
+    return ((TP + TN) / len(y_true))    # length of true and pred is validated to be the same in get_quality_factors
 
 
 def precision_score(y_true: List[int], y_pred: List[int]) -> float:
@@ -50,7 +70,8 @@ def precision_score(y_true: List[int], y_pred: List[int]) -> float:
 
     :return: precision score
     """
-    ...
+    TN, FP, FN, TP = get_quality_factors(y_true, y_pred)
+    return (TP / (TP + FP))
 
 
 def recall_score(y_true: List[int], y_pred: List[int]) -> float:
@@ -61,7 +82,8 @@ def recall_score(y_true: List[int], y_pred: List[int]) -> float:
 
     :return: recall score
     """
-    ...
+    TN, FP, FN, TP = get_quality_factors(y_true, y_pred)
+    return (TP / (TP + FN))
 
 
 def f1_score(y_true: List[int], y_pred: List[int]) -> float:
@@ -72,4 +94,7 @@ def f1_score(y_true: List[int], y_pred: List[int]) -> float:
 
     :return: F1-score
     """
-    ...
+    TN, FP, FN, TP = get_quality_factors(y_true, y_pred)
+    return (2*precision_score(y_true, y_pred)*recall_score(y_true, y_pred)) / (precision_score(y_true, y_pred) + recall_score(y_true, y_pred))
+
+# all scores calculated with formulas from https://www.geeksforgeeks.org/confusion-matrix-machine-learning/
