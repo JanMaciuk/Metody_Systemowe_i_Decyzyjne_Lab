@@ -1,8 +1,4 @@
-"Time
-t (s)","Current
- I (mA)","Magnetic field strength
- B (µT)","Background Temperature
-T (°C)"
+"Time t (s)","Current I (mA)","Magnetic field strength B (µT)","Background Temperature T (°C)"
 1,5072,4075,24
 5,5068,4074,24
 8,5065,4074,24
