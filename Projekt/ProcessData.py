@@ -22,7 +22,6 @@ def read_experiment_csv(experimentNumber: int, raw: bool) -> pandas.DataFrame:
         print("read_experiment_csv failed, file not found, check if experiment data exists")
         raise   # Rethrow, this is not recoverable.
     
-    
 
 def save_processed_csv(dataFrame: pandas.DataFrame, experimentNumber: int) -> None:
     """
@@ -37,12 +36,14 @@ def save_processed_csv(dataFrame: pandas.DataFrame, experimentNumber: int) -> No
     except Exception:
         print("save_processed_csv failed.") # We can continue execution, but the data will be lost.
 
+
 def remove_background_temperature(dataFrame: pandas.DataFrame) -> None:
     """
     Remove the background temperature from the experiment data,
     returns a new DataFrame with the background temperature removed.
     """
     dataFrame = dataFrame.drop(LABEL_BACKGROUND_TEMP, axis='columns')
+
 
 def remove_invalid_magnetic_increases(dataFrame: pandas.DataFrame) -> None:
     """
@@ -57,6 +58,7 @@ def remove_invalid_magnetic_increases(dataFrame: pandas.DataFrame) -> None:
         elif row[LABEL_MAGNETIC_FIELD] > currentMinimumStrength:
             dataFrame.drop(index, inplace=True)
 
+
 def polynomial_fit(df: pandas.DataFrame, x_label: str, y_label: str, degree: int) -> list[float]:
     """
     Fits a polynomial of a given degree to the data and returns the coefficients.
@@ -69,6 +71,7 @@ def polynomial_fit(df: pandas.DataFrame, x_label: str, y_label: str, degree: int
     coeffs = numpy.polyfit(x, y, degree)
 
     return coeffs.tolist()
+
 
 def remove_outliers(dataFrame: pandas.DataFrame, x_label: str, y_label: str, coefficents:list[float], threshold: float = 2.0 ) -> pandas.DataFrame:
     """
@@ -98,17 +101,38 @@ def remove_outliers(dataFrame: pandas.DataFrame, x_label: str, y_label: str, coe
     non_outliers = numpy.abs(residuals) <= outlier_threshold
     return dataFrame[non_outliers]
 
+
+def process_experiment_data(polynomialDegree:int=1) -> None:
+    """
+    Process the experiment data for each file in Raw folder.
+    Removing background temperature, invalid magnetic field increases and outliers.
+    """
+    folderPath:str = os.path.dirname(os.path.realpath(__file__))  # Get the path of the current file
+    folderPath = os.path.join(folderPath, r"Data\Raw")
+    for i in range(1,len(os.listdir(folderPath))+1):
+        dataFrame = read_experiment_csv(i, True)
+        remove_background_temperature(dataFrame)
+        polynomial_coefficents = polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomialDegree)
+        dataFrame = remove_outliers(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
+        remove_invalid_magnetic_increases(dataFrame)
+        polynomial_coefficents = polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomialDegree)
+        graph_polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
+        save_processed_csv(dataFrame, i)
+
+
 def test() -> None:
-    dataFrame = read_experiment_csv(1,True)
+    dataFrame = read_experiment_csv(4,True)
     remove_background_temperature(dataFrame)
     #graph_data_against_time(dataFrame, current=False, magneticField=True)
     #graph_data_against_time(remove_outliers(dataFrame), current=False, magneticField=True)
     #print(polynomial_fit(dataFrame, LABEL_MAGNETIC_FIELD, LABEL_CURRENT, 2))
-    #remove_invalid_magnetic_increases(dataFrame)
+
     #graph_data_against_time(dataFrame, current=True, magneticField=False, coefficents=polynomial_fit(dataFrame, LABEL_MAGNETIC_FIELD, LABEL_CURRENT, 2), show=True)
-    polynomial_coefficents = polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, 2)
+    polynomial_coefficents = polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, 1)
     graph_polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
     dataFrame = remove_outliers(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
+    remove_invalid_magnetic_increases(dataFrame)
     graph_polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
 
-test()
+process_experiment_data()
+#test()
