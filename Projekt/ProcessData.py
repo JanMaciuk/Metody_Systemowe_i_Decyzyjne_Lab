@@ -1,7 +1,7 @@
 import numpy, pandas, os
-from Graphing import LABEL_CURRENT, LABEL_MAGNETIC_FIELD, LABEL_TIME, LABEL_BACKGROUND_TEMP, graph_data_against_time
+from Graphing import LABEL_CURRENT, LABEL_MAGNETIC_FIELD, LABEL_TIME, LABEL_BACKGROUND_TEMP, graph_data_against_time, graph_polynomial_fit
 from sklearn.linear_model import LinearRegression
-
+import matplotlib.pyplot
 
 def read_experiment_csv(experimentNumber: int, raw: bool) -> pandas.DataFrame:
     """
@@ -37,23 +37,53 @@ def save_processed_csv(dataFrame: pandas.DataFrame, experimentNumber: int) -> No
     except Exception:
         print("save_processed_csv failed.") # We can continue execution, but the data will be lost.
 
-def remove_background_temperature(dataFrame: pandas.DataFrame) -> pandas.DataFrame:
+def remove_background_temperature(dataFrame: pandas.DataFrame) -> None:
     """
     Remove the background temperature from the experiment data,
     returns a new DataFrame with the background temperature removed.
     """
     dataFrame = dataFrame.drop(LABEL_BACKGROUND_TEMP, axis='columns')
-    return dataFrame
 
-def remove_outliers(dataFrame, x_col=LABEL_MAGNETIC_FIELD, y_col=LABEL_CURRENT, threshold=2.0):    #TODO
-    # Fit a linear regression model
-    X = dataFrame[[x_col]].values
-    y = dataFrame[y_col].values
-    model = LinearRegression()
-    model.fit(X, y)
+def remove_invalid_magnetic_increases(dataFrame: pandas.DataFrame) -> None:
+    """
+    Removes invalid increases in magnetic field strength from dataframe.
+    Magnetic field should weaken with time as temeperature increases, an increase indicates invalid readings.
+    Outliers should be removed before calling this function, they could introduce false minimas.
+    """
+    currentMinimumStrength = dataFrame.iloc[0][LABEL_MAGNETIC_FIELD]
+    for index, row in dataFrame.iterrows():
+        if row[LABEL_MAGNETIC_FIELD] < currentMinimumStrength:
+            currentMinimumStrength = row[LABEL_MAGNETIC_FIELD]
+        elif row[LABEL_MAGNETIC_FIELD] > currentMinimumStrength:
+            dataFrame.drop(index, inplace=True)
+
+def polynomial_fit(df: pandas.DataFrame, x_label: str, y_label: str, degree: int) -> list[float]:
+    """
+    Fits a polynomial of a given degree to the data and returns the coefficients.
+    """
+    # Extract x and y values from the dataframe
+    x = df[x_label].values
+    y = df[y_label].values
+
+    # Use numpy's polyfit function to fit a polynomial to the data
+    coeffs = numpy.polyfit(x, y, degree)
+
+    return coeffs.tolist()
+
+def remove_outliers(dataFrame: pandas.DataFrame, x_label: str, y_label: str, coefficents:list[float], threshold: float = 2.0 ) -> pandas.DataFrame:
+    """
+    Removes points that are far away from the polynomial fit line.
+    Returns the dataframe without outliers.
+    Threshold is in standard deviations of the residuals.
+    """
+    # Fit the polynomial and get the coefficients
     
-    # Predict the y values
-    y_pred = model.predict(X)
+    # Extract x and y values from the dataframe
+    x = dataFrame[x_label].values
+    y = dataFrame[y_label].values
+    
+    # Calculate the predicted y values using the polynomial coefficients
+    y_pred = numpy.polyval(coefficents, x)
     
     # Calculate the residuals
     residuals = y - y_pred
@@ -64,33 +94,21 @@ def remove_outliers(dataFrame, x_col=LABEL_MAGNETIC_FIELD, y_col=LABEL_CURRENT, 
     # Determine the outlier threshold
     outlier_threshold = threshold * std_residuals
     
-    # Identify outliers
+    # Identify non-outliers
     non_outliers = numpy.abs(residuals) <= outlier_threshold
-    
-    # Remove outliers from the dataframe and return
-    dataFrame = dataFrame[non_outliers] 
-    return dataFrame
-
-def remove_invalid_magnetic_increases(dataFrame: pandas.DataFrame) -> pandas.DataFrame:
-    """
-    Returns a dataframe with invalid increases in magnetic field strength removed.
-    Magnetic field should weaken with time as temeperature increases, an increase indicates invalid readings.
-    Outliers should be removed before calling this function, they could introduce false minimas.
-    """
-    currentMinimumStrength = dataFrame.iloc[0][LABEL_MAGNETIC_FIELD]
-    for index, row in dataFrame.iterrows():
-        if row[LABEL_MAGNETIC_FIELD] < currentMinimumStrength:
-            currentMinimumStrength = row[LABEL_MAGNETIC_FIELD]
-        elif row[LABEL_MAGNETIC_FIELD] > currentMinimumStrength:
-            dataFrame.drop(index, inplace=True)
-    return dataFrame
+    return dataFrame[non_outliers]
 
 def test() -> None:
     dataFrame = read_experiment_csv(1,True)
-    #print(dataFrame)
-    dataFrame = remove_background_temperature(dataFrame)
-    graph_data_against_time(dataFrame, current=False, magneticField=True)
+    remove_background_temperature(dataFrame)
+    #graph_data_against_time(dataFrame, current=False, magneticField=True)
     #graph_data_against_time(remove_outliers(dataFrame), current=False, magneticField=True)
-    remove_invalid_magnetic_increases(dataFrame)
-    graph_data_against_time(dataFrame, current=False, magneticField=True)
+    #print(polynomial_fit(dataFrame, LABEL_MAGNETIC_FIELD, LABEL_CURRENT, 2))
+    #remove_invalid_magnetic_increases(dataFrame)
+    #graph_data_against_time(dataFrame, current=True, magneticField=False, coefficents=polynomial_fit(dataFrame, LABEL_MAGNETIC_FIELD, LABEL_CURRENT, 2), show=True)
+    polynomial_coefficents = polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, 2)
+    graph_polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
+    dataFrame = remove_outliers(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
+    graph_polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
+
 test()
