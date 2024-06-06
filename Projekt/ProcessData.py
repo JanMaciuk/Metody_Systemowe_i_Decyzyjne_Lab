@@ -1,7 +1,6 @@
 import numpy, pandas, os
 from Graphing import LABEL_CURRENT, LABEL_MAGNETIC_FIELD, LABEL_TIME, LABEL_BACKGROUND_TEMP, graph_data_against_time, graph_polynomial_fit
-from sklearn.linear_model import LinearRegression
-import matplotlib.pyplot
+from ydata_profiling import ProfileReport   # Newer version of pandas-profiling
 
 def read_experiment_csv(experimentNumber: int, raw: bool) -> pandas.DataFrame:
     """
@@ -102,15 +101,17 @@ def remove_outliers(dataFrame: pandas.DataFrame, x_label: str, y_label: str, coe
     return dataFrame[non_outliers]
 
 
-def process_experiment_data(polynomialDegree:int=1) -> None:
+def preprocess_experiment_data(makeReport:bool, polynomialDegree:int=1) -> None:
     """
-    Process the experiment data for each file in Raw folder.
+    Preprocess the experiment data for each file in Raw folder.
     Removing background temperature, invalid magnetic field increases and outliers.
     """
     folderPath:str = os.path.dirname(os.path.realpath(__file__))  # Get the path of the current file
     folderPath = os.path.join(folderPath, r"Data\Raw")
     for i in range(1,len(os.listdir(folderPath))+1):
         dataFrame = read_experiment_csv(i, True)
+        if makeReport:
+            exploratory_analysis_report(dataFrame)
         remove_background_temperature(dataFrame)
         polynomial_coefficents = polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomialDegree)
         dataFrame = remove_outliers(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
@@ -119,6 +120,20 @@ def process_experiment_data(polynomialDegree:int=1) -> None:
         graph_polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
         save_processed_csv(dataFrame, i)
 
+
+def exploratory_analysis_report(dataFrame: pandas.DataFrame) -> None:
+    """
+    Generate a pandas-profiling report for the data.
+    Report will be saved as a HTML file in the Reports folder, with a number after the previous file.
+    """
+    filePath:str = os.path.dirname(os.path.realpath(__file__))  # Get the path of the current file
+    reportNumber = 1
+    filePath = os.path.join(filePath, "Reports")
+    while os.path.isfile(os.path.join(filePath, "report"+str(reportNumber)+".html")):
+        reportNumber += 1
+    filePath = os.path.join(filePath, "report"+str(reportNumber)+".html")
+    report = ProfileReport(dataFrame)
+    report.to_file(filePath)
 
 def test() -> None:
     dataFrame = read_experiment_csv(4,True)
@@ -134,5 +149,7 @@ def test() -> None:
     remove_invalid_magnetic_increases(dataFrame)
     graph_polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
 
-process_experiment_data()
+if __name__ == "__main__":
+    preprocess_experiment_data(makeReport=True)
+
 #test()
