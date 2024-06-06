@@ -72,7 +72,7 @@ def polynomial_fit(df: pandas.DataFrame, x_label: str, y_label: str, degree: int
     return coeffs.tolist()
 
 
-def remove_outliers(dataFrame: pandas.DataFrame, x_label: str, y_label: str, coefficents:list[float], threshold: float = 2.0 ) -> pandas.DataFrame:
+def remove_outliers(dataFrame: pandas.DataFrame, x_label: str, y_label: str, coefficents:list[float], threshold: float = 3.0 ) -> pandas.DataFrame:
     """
     Removes points that are far away from the polynomial fit line.
     Returns the dataframe without outliers.
@@ -113,11 +113,12 @@ def preprocess_experiment_data(makeReport:bool, polynomialDegree:int=1) -> None:
         if makeReport:
             exploratory_analysis_report(dataFrame)
         remove_background_temperature(dataFrame)
-        polynomial_coefficents = polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomialDegree)
-        dataFrame = remove_outliers(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
+        polynomialCoefficents = polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, 1)
+        graph_polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomialCoefficents, title="Initial data with line of best fit for outlier removal")
+        dataFrame = remove_outliers(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomialCoefficents)
         remove_invalid_magnetic_increases(dataFrame)
-        polynomial_coefficents = polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomialDegree)
-        graph_polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
+        polynomialCoefficents = polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomialDegree)
+        graph_polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomialCoefficents, title=("Data after preprocessing with line of best fit: "+(', '.join(f"{num:.3f}" for num in polynomialCoefficents))))
         save_processed_csv(dataFrame, i)
 
 
@@ -153,3 +154,6 @@ if __name__ == "__main__":
     preprocess_experiment_data(makeReport=True)
 
 #test()
+
+#TODO:
+# Use a linter to check for style issues.
