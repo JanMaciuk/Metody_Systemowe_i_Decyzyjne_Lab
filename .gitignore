@@ -7,3 +7,6 @@
 *.gz
 *.toc
 __pycache__/
+Plots/
+Reports/
+.vscode/

@@ -25,7 +25,8 @@ def graph_data_against_time(dataFrame: pandas.DataFrame, current:bool = True, ma
     matplotlib.pyplot.legend()
     show_or_save(show)
 
-def graph_polynomial_fit(dataFrame: pandas.DataFrame, x_label: str, y_label: str, coefficents: list[float], show:bool=False) -> None:
+def graph_polynomial_fit(dataFrame: pandas.DataFrame, x_label: str, y_label: str, 
+                         coefficents: list[float], show:bool=False, title:str="Polynomial fit graph") -> None:
     """
     Plots the polynomial fit along with the original data points.
     """
@@ -41,12 +42,12 @@ def graph_polynomial_fit(dataFrame: pandas.DataFrame, x_label: str, y_label: str
     # Plot the original data points
     matplotlib.pyplot.scatter(x, y, label='Data Points')
     # Plot the polynomial fit curve
-    matplotlib.pyplot.plot(x_range, y_fit, label=f'Polynomial fit')
+    matplotlib.pyplot.plot(x_range, y_fit, label=f'Polynomial fit line')
     matplotlib.pyplot.gca().invert_xaxis()
     # Add labels and title
     matplotlib.pyplot.xlabel(x_label)
     matplotlib.pyplot.ylabel(y_label)
-    matplotlib.pyplot.title('Polynomial Fit')
+    matplotlib.pyplot.title(title)
     matplotlib.pyplot.legend()
     show_or_save(show)
 
