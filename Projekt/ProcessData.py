@@ -58,13 +58,13 @@ def remove_invalid_magnetic_increases(dataFrame: pandas.DataFrame) -> None:
             dataFrame.drop(index, inplace=True)
 
 
-def polynomial_fit(df: pandas.DataFrame, x_label: str, y_label: str, degree: int) -> list[float]:
+def polynomial_fit(dataFrame: pandas.DataFrame, Xlabel: str, Ylabel: str, degree: int) -> list[float]:
     """
     Fits a polynomial of a given degree to the data and returns the coefficients.
     """
     # Extract x and y values from the dataframe
-    x = df[x_label].values
-    y = df[y_label].values
+    x = dataFrame[Xlabel].values
+    y = dataFrame[Ylabel].values
 
     # Use numpy's polyfit function to fit a polynomial to the data
     coeffs = numpy.polyfit(x, y, degree)
@@ -72,7 +72,7 @@ def polynomial_fit(df: pandas.DataFrame, x_label: str, y_label: str, degree: int
     return coeffs.tolist()
 
 
-def remove_outliers(dataFrame: pandas.DataFrame, x_label: str, y_label: str, coefficents:list[float], threshold: float = 3.0 ) -> pandas.DataFrame:
+def remove_outliers(dataFrame: pandas.DataFrame, Xlabel: str, Ylabel: str, coefficents:list[float], threshold: float = 3.0 ) -> pandas.DataFrame:
     """
     Removes points that are far away from the polynomial fit line.
     Returns the dataframe without outliers.
@@ -81,8 +81,8 @@ def remove_outliers(dataFrame: pandas.DataFrame, x_label: str, y_label: str, coe
     # Fit the polynomial and get the coefficients
     
     # Extract x and y values from the dataframe
-    x = dataFrame[x_label].values
-    y = dataFrame[y_label].values
+    x = dataFrame[Xlabel].values
+    y = dataFrame[Ylabel].values
     
     # Calculate the predicted y values using the polynomial coefficients
     y_pred = numpy.polyval(coefficents, x)
@@ -136,6 +136,7 @@ def exploratory_analysis_report(dataFrame: pandas.DataFrame) -> None:
     report = ProfileReport(dataFrame)
     report.to_file(filePath)
 
+
 def test() -> None:
     dataFrame = read_experiment_csv(4,True)
     remove_background_temperature(dataFrame)
@@ -151,7 +152,7 @@ def test() -> None:
     graph_polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
 
 if __name__ == "__main__":
-    preprocess_experiment_data(makeReport=True)
+    preprocess_experiment_data(makeReport=False)
 
 #test()
 
