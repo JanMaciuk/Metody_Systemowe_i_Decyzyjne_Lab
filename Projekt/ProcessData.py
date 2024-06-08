@@ -101,13 +101,23 @@ def remove_outliers(dataFrame: pandas.DataFrame, Xlabel: str, Ylabel: str, coeff
     return dataFrame[non_outliers]
 
 
-def preprocess_experiment_data(makeReport:bool, polynomialDegree:int=1) -> None:
+def predict_value(slope:float, initialX:int, initialY:int, targetX:int) -> float:
+    """
+    Predicts the value of Y at a given X using the slope of the line.
+    """
+    return (initialY + slope*(targetX - initialX))
+
+
+def Process_experiment_data(makeReport:bool, polynomialDegree:int=1) -> float:
     """
     Preprocess the experiment data for each file in Raw folder.
     Removing background temperature, invalid magnetic field increases and outliers.
+    Average slope of the line of best fit for each experiment is returned.
     """
     folderPath:str = os.path.dirname(os.path.realpath(__file__))  # Get the path of the current file
     folderPath = os.path.join(folderPath, r"Data\Raw")
+    ExperimentsCoefficients:list[float] = []
+    averageCoefficent:float = 0.0
     for i in range(1,len(os.listdir(folderPath))+1):
         dataFrame = read_experiment_csv(i, True)
         if makeReport:
@@ -120,6 +130,11 @@ def preprocess_experiment_data(makeReport:bool, polynomialDegree:int=1) -> None:
         polynomialCoefficents = polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomialDegree)
         graph_polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomialCoefficents, title=("Data after preprocessing with line of best fit: "+(', '.join(f"{num:.3f}" for num in polynomialCoefficents))))
         save_processed_csv(dataFrame, i)
+        ExperimentsCoefficients.append(polynomialCoefficents[0])
+    for coeff in ExperimentsCoefficients:
+        averageCoefficent += coeff
+    averageCoefficent /= len(ExperimentsCoefficients)
+    return averageCoefficent
 
 
 def exploratory_analysis_report(dataFrame: pandas.DataFrame) -> None:
@@ -152,7 +167,15 @@ def test() -> None:
     graph_polynomial_fit(dataFrame, LABEL_CURRENT, LABEL_MAGNETIC_FIELD, polynomial_coefficents)
 
 if __name__ == "__main__":
-    preprocess_experiment_data(makeReport=False)
+    averageCoefficent = Process_experiment_data(makeReport=False)
+    print("Average slope of the line of best fit across all experiments: "+ str(averageCoefficent))
+    experimentDF = read_experiment_csv(5, False)
+    predictX = experimentDF.iloc[0][LABEL_CURRENT]
+    predictY = experimentDF.iloc[0][LABEL_MAGNETIC_FIELD]
+    predictAt = experimentDF.iloc[-1][LABEL_CURRENT]
+    predicted = predict_value(averageCoefficent, predictX, predictY, predictAt)
+    ErrorPercentage = ((predicted - experimentDF.iloc[-1][LABEL_MAGNETIC_FIELD])/experimentDF.iloc[-1][LABEL_MAGNETIC_FIELD])*100
+    print("Predicted value of magnetic field at: "+str(predictAt)+" is: "+str(predicted)+" with an error of: "+str(ErrorPercentage)+"%")
 
 #test()
 
